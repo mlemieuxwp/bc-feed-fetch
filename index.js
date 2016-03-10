@@ -6,43 +6,36 @@ var https = require('https'),
     fs = require('fs'),
     colors = require('colors'),
     httpProxy = require('./lib/http-proxy'),
-    fixturesDir = path.join(__dirname, '.', '.', 'test', 'fixtures');
+    fixturesDir = path.join(__dirname, 'test', 'fixtures');
 //
-// Create the target HTTP server 
+// Create the target HTTP server
 //
-var data_str = '';
-
 http.createServer(function(request, response) {
+    var data;
     http.get({
         host: 'www.washingtonpost.com',
         path: '/sf/brand-connect/api/get_page/?custom_fields=true&id=2624'
     }, function(res) {
         res.on('data', function(d) {
-            data_str += d;
-            //console.log(d.toString());
+            data = d;
         });
 
         res.on('end', next);
     });
 
     function next() {
-        response.writeHead(200, { 'Content-Type': 'application/javascript', 'Access-Control-Allow-Origin':'*', 'Cache-Control': 'no-cache' });
-    	response.write('callback('+data_str+')');
+        response.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin':'*', 'Cache-Control': 'no-cache' });
+    	response.write(JSON.stringify(data));
     	response.end();
     }
 }).listen(9009);
 
-//
-// Create the HTTPS proxy server listening on port 8000
-//
 httpProxy.createServer({
-    target: {
-        host: 'localhost',
-        port: 9009
-    },
+    target: 'http://127.0.0.1:9009',
     ssl: {
-        key: fs.readFileSync(path.join(fixturesDir, 'agent2-key.pem'), 'utf8'),
-        cert: fs.readFileSync(path.join(fixturesDir, 'agent2-cert.pem'), 'utf8')
+        key: fs.readFileSync(path.join(fixturesDir, 'agent2-key.pem')),
+        cert: fs.readFileSync(path.join(fixturesDir, 'agent2-cert.pem')),
+        ciphers: 'AES128-GCM-SHA256'
     }
 }).listen(8009);
 
