@@ -11,13 +11,15 @@ var https = require('https'),
 // Create the target HTTP server
 //
 http.createServer(function(request, response) {
-    var data;
+    var data = '';
     http.get({
         host: 'www.washingtonpost.com',
-        path: '/sf/brand-connect/api/get_page/?custom_fields=true&id=2624'
+        path: '/sf/brand-connect/api/get_page/?custom_fields=true&id=2624',
+        headers: {'Content-Type': 'application/json' }
     }, function(res) {
+        res.setEncoding('utf8');
         res.on('data', function(d) {
-            data = d;
+            data += d;
         });
 
         res.on('end', next);
@@ -25,7 +27,7 @@ http.createServer(function(request, response) {
 
     function next() {
         response.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin':'*', 'Cache-Control': 'no-cache' });
-    	response.write(JSON.stringify(data));
+    	response.write(data);
     	response.end();
     }
 }).listen(9009);
