@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.github.com/nodejitsu/node-http-proxy/master/doc/logo.png"/>
-</p>
-
 Brand Connect Feed Fetch
 =======
 `bc-feed-fetch` is a simple app to get an http feed and return the data over https.  This is built off of `node-http-proxy` which can be used for testing https locally.  
