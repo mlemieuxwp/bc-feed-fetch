@@ -6,15 +6,17 @@ var https = require('https'),
     fs = require('fs'),
     colors = require('colors'),
     httpProxy = require('./lib/http-proxy'),
-    fixturesDir = path.join(__dirname, 'test', 'fixtures');
+    fixturesDir = path.join(__dirname, 'test', 'fixtures'),
+    url = require('url');
 //
 // Create the target HTTP server
 //
 http.createServer(function(request, response) {
+    var queryData = url.parse(request.url, true).query;
     var data = '';
     http.get({
         host: 'www.washingtonpost.com',
-        path: '/sf/brand-connect/api/get_page/?custom_fields=true&id=2624',
+        path: queryData.url,
         headers: {'Content-Type': 'application/json' }
     }, function(res) {
         res.setEncoding('utf8');
